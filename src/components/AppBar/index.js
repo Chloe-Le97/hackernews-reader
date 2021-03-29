@@ -17,10 +17,10 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   text:{
-    color: 'white',
+    color: 'black',
     padding: 15,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
 });
 

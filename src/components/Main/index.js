@@ -4,6 +4,7 @@ import { Route, Switch, Redirect } from 'react-router-native';
 import AppBar from '../AppBar';
 import NewsList from '../NewsList';
 import SingleView from '../SingleView';
+import SavedPost from '../SavedPost';
 
 const styles = StyleSheet.create({
   container: {
@@ -24,9 +25,7 @@ const Main = () => {
             <SingleView/>
         </Route>
         <Route path="/saved" exact>
-            <View>
-                <Text>Saved</Text>
-            </View>
+            <SavedPost/>
         </Route>
         <Redirect to="/" />
       </Switch>

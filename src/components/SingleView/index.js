@@ -1,26 +1,34 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, FlatList, StyleSheet, Dimensions, TouchableWithoutFeedback, useWindowDimensions} from 'react-native';
+import {View, Text, FlatList, StyleSheet, TouchableOpacity, useWindowDimensions} from 'react-native';
 import {useParams} from 'react-router-native';
 import * as Linking from 'expo-linking';
 import HTML from "react-native-render-html";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const styles = StyleSheet.create({
     separator: {
       height: 10,
     },
-    flatlist:{
-      marginBottom: 1000,
-      flexGrow:1, 
-      height: Dimensions.get('window').height - 30
-    },
-    p:{
-        fontWeight: '300',
-        color: '#FF3366'
-    },
+
     commentAuthor:{
         fontSize: 12,
-        fontWeight: '400',
-    }
+        fontWeight: '700',
+    },
+    flatlistHead:{
+        padding: 5,
+        marginBottom: 10,
+        backgroundColor:'white',
+    },
+    saveBtn:{
+        backgroundColor:'#f29d00', 
+        width: 50, 
+        padding: 5, 
+        borderRadius: 5, 
+        marginTop: 5
+    },
+    textBtn:{
+        textAlign:'center',
+        color:'#F6F6EF'}
   });
 
 const ItemSeparator = () => <View style={styles.separator} />;
@@ -29,6 +37,10 @@ const CommentRender = (props) => {
     let item = props.item;
     const contentWidth = useWindowDimensions().width;
 
+    if(!item.text){return(
+        <Text>Loading...</Text>
+    )}
+
     return(
     <View>
         <Text style={styles.commentAuthor}>{item.author} on {item.created_at.split("T")[0]}</Text>
@@ -36,7 +48,10 @@ const CommentRender = (props) => {
         {item.children.length>0?(
         <>
             {item.children.map((child) => 
-            (<CommentRender key={child.id} item={child}/>))}
+            (<View key={child.id} style={{marginLeft: 10}}>
+                <CommentRender key={child.id} item={child}/>
+            </View>
+            ))}
         </>)
         :(null)}
     </View>)
@@ -47,58 +62,87 @@ const SingleView = () =>{
 
     const id = useParams().id;
 
-    console.log(id)
-
     const [comments, setComments] = useState([]);
     const [title, setTitle] = useState('');
     const [url, setUrl] = useState('');
 
     const fetchAPI = async () =>{
+        try{
+            const response = await fetch(`https://hn.algolia.com/api/v1/items/${id}`)
+            const json = await response.json();
+    
+            setComments(json.children)
+            setTitle(json.title)
+            setUrl(json.url)
+        }catch (e){
+            
+        }
 
-        const response = await fetch(`https://hn.algolia.com/api/v1/items/${id}`)
-        const json = await response.json();
-
-        setComments(json.children)
-        setTitle(json.title)
-        setUrl(json.url)
-
-        console.log(json.children);
     }
 
     useEffect(()=>{
         fetchAPI();
     },[])
 
-    if(title==''){return (<View><Text>Loading...</Text></View>)}
+    const savePost = async () =>{
+        try {
+            let jsonValue = await AsyncStorage.getItem('POSTS')
+ 
 
-    const timeConverter = (date) =>{
-        const newDate =  date.getFullYear()+'-' + (date.getMonth()+1) + '-'+date.getDate()
-        return newDate
+            if(jsonValue!=null){
+                let raw = JSON.parse(jsonValue)
+
+                const duplicate = raw.find((news)=> news.objectID== item.objectID)
+                if(duplicate){return}
+
+                const savedItem = [item,...JSON.parse(jsonValue)];
+                await AsyncStorage.setItem(
+                'POSTS',
+                JSON.stringify(savedItem)
+                );
+                console.log('success')
+            }else{
+                jsonValue= [];
+                const savedItem = [item,...jsonValue];
+                await AsyncStorage.setItem(
+                'POSTS',
+                JSON.stringify(savedItem)
+            );
+            console.log('success')
+            }
+            
+          } catch (error) {
+            console.log(error)
+          }
     }
 
+    if(title==''){return (<View><Text>Loading...</Text></View>)}
+
     return(
-        <View>
-            <View>
-                <Text>{title}</Text>
-                <TouchableWithoutFeedback onPress={()=> Linking.openURL(`${url}`)}><Text>({url})</Text></TouchableWithoutFeedback>
-            </View>
-            <View style={{marginTop: 25}}>
+            <View style={{marginBottom: 90, flexGrow:1,  backgroundColor:'#F6F6EF'}}>
             <FlatList
             data={comments}
-            ItemSeparatorComponent={ItemSeparator}
             contentContainerStyle={{ minHeight: `100%` }}
+            ListHeaderComponent={()=>(
+                <View style={styles.flatlistHead}>
+                    <Text style={{fontWeight:'bold'}}>{title}</Text>
+                    {url?(<Text onPress={()=> Linking.openURL(`${url}`)} style={{textDecorationLine:'underline'}}>({url})</Text>):(null)}
+                    <TouchableOpacity style={styles.saveBtn} onPress={savePost}>
+                        <Text style={styles.textBtn}>Save</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
+            ItemSeparatorComponent={ItemSeparator}
             keyExtractor={(item, index) => index.toString()}
             scrollEnabled={true}
             renderItem={({ item, index, ItemSeparatorComponent })=>(
-            <View key={item.objectID} style={{ flex: 1 }}>
-                <View>
+            <View style={{ flex: 1 , padding: 5, marginTop: 5, backgroundColor: 'white'}}>
                     <CommentRender item={item}/>
-                </View> 
             </View>
             )}
             />
             </View>
-         </View>
+  
     )
 
 }
