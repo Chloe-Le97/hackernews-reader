@@ -18,7 +18,6 @@ const SavedPost = () =>{
     const getNews = async () =>{
         let jsonValue = await AsyncStorage.getItem('POSTS');
         let raw = JSON.parse(jsonValue);
-
         setSavedPosts(raw)
     }
 
@@ -26,8 +25,21 @@ const SavedPost = () =>{
         getNews()
     },[])
 
+    const removeSavedPost = async (id) =>{
+
+      let jsonValue = await AsyncStorage.getItem('POSTS');
+      let raw = JSON.parse(jsonValue);
+
+      let newPost = raw.filter(((news)=> news.objectID != id))
+
+      await AsyncStorage.setItem('POSTS',JSON.stringify(newPost));
+
+      setSavedPosts(newPost)
+
+    }
+
     return(
-        <View style={{marginBottom: 100, flexGrow:1, backgroundColor:'#F6F6EF'}}>
+        <View style={{marginBottom: 82, flexGrow:1, backgroundColor:'#F6F6EF'}}>
         <FlatList
         data={savedPosts}
         ItemSeparatorComponent={ItemSeparator}
@@ -36,7 +48,7 @@ const SavedPost = () =>{
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item, index, ItemSeparatorComponent })=>(
           <View key={item.objectID} style={{ flex: 1 }}>
-            <FavoriteItem item={item}/> 
+            <FavoriteItem item={item} removeSavedPost={removeSavedPost}/> 
           </View>
         )}
       />

@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
     },
     textBtn:{
         textAlign:'center',
-        color:'#F6F6EF'}
+        color:'black'}
   });
 
 const ItemSeparator = () => <View style={styles.separator} />;
@@ -64,6 +64,8 @@ const SingleView = () =>{
 
     const [comments, setComments] = useState([]);
     const [title, setTitle] = useState('');
+    const [author, setAuthor] = useState('');
+    const [point, setPoint] = useState('');
     const [url, setUrl] = useState('');
 
     const fetchAPI = async () =>{
@@ -74,8 +76,11 @@ const SingleView = () =>{
             setComments(json.children)
             setTitle(json.title)
             setUrl(json.url)
+            setAuthor(json.author)
+            setPoint(json.points)
+
         }catch (e){
-            
+            console.log(e)
         }
 
     }
@@ -119,26 +124,32 @@ const SingleView = () =>{
     if(title==''){return (<View><Text>Loading...</Text></View>)}
 
     return(
-            <View style={{marginBottom: 90, flexGrow:1,  backgroundColor:'#F6F6EF'}}>
+            <View style={{marginBottom: 80, flexGrow:1,  backgroundColor:'#F6F6EF'}}>
             <FlatList
             data={comments}
             contentContainerStyle={{ minHeight: `100%` }}
             ListHeaderComponent={()=>(
+
                 <View style={styles.flatlistHead}>
                     <Text style={{fontWeight:'bold'}}>{title}</Text>
+                    <Text>{point} points | {author}</Text>
+
                     {url?(<Text onPress={()=> Linking.openURL(`${url}`)} style={{textDecorationLine:'underline'}}>({url})</Text>):(null)}
                     <TouchableOpacity style={styles.saveBtn} onPress={savePost}>
                         <Text style={styles.textBtn}>Save</Text>
                     </TouchableOpacity>
                 </View>
+
             )}
             ItemSeparatorComponent={ItemSeparator}
             keyExtractor={(item, index) => index.toString()}
             scrollEnabled={true}
             renderItem={({ item, index, ItemSeparatorComponent })=>(
+
             <View style={{ flex: 1 , padding: 5, marginTop: 5, backgroundColor: 'white'}}>
                     <CommentRender item={item}/>
             </View>
+
             )}
             />
             </View>

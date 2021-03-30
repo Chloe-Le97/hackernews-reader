@@ -14,7 +14,8 @@ const styles = StyleSheet.create({
     },
     textBtn:{
         textAlign:'center',
-        color:'white'}
+        fontWeight: '600',
+        color:'black'}
 })
 
 const NewsItem = (props) =>{
