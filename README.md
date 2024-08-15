@@ -1,27 +1,23 @@
-# hackernews-reader
+# HackerNews Reader
 
-A mobile app developed for reading news from HackerNews. Developed with React Native using API from https://hn.algolia.com/api. 
+HackerNews Reader is a mobile application developed for reading news from HackerNews. It is developed with React Native and uses the API from [HackerNews Algolia](https://hn.algolia.com/api).
 
-## Technology
-Project is created with:
-- React Native 
-- Hooks 
-- API from hn.algolia.com
+## Technologies
 
+This project is created with:
+
+- React Native
+- React Hooks
+- [HackerNews Algolia API](https://hn.algolia.com/api)
 
 ## Setup
 
-To run this project, install it locally using npm install after cloning it.
+To run this project, follow these steps:
 
-This project is run with Expo. If you do not installed Expo yet, you can run: npm install --global expo-cli 
+1. Clone the repository to your local machine.
+2. Navigate to the project directory and run `npm install` to install the dependencies.
 
-### Run
+This project runs with Expo. If you haven't installed Expo yet, you can install it globally with the following command:
 
-Run npm start and Open [http://localhost:19002](http://localhost:19002) to view the Expo Developer Tools.
-
-From Expo Developer Tools, you can choose the browser or mobile option. 
-
-To run on mobile, download the Expo Go to your mobile and scan the QR code. 
-
-
-The application works best with mobile. 
+```bash
+npm install --global expo-cli
